@@ -48,3 +48,4 @@ sqlite.db-journal
 
 # debug/local utility
 debug-db.js
+migrate-to-pg.js
