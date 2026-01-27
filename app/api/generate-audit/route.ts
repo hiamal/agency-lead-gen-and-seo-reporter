@@ -40,7 +40,8 @@ export async function POST(req: Request) {
         const reportContent = responseText.trim() || "<p>The audit was generated but the report content was empty.</p>";
 
         // Find user to link audit
-        const user = await db.select().from(schema.user).where(eq(schema.user.email, email)).get();
+        const users = await db.select().from(schema.user).where(eq(schema.user.email, email)).limit(1);
+        const user = users[0];
 
         if (user) {
             await db.insert(schema.audit).values({
