@@ -4,7 +4,7 @@ import { useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { Loader2, Search, MapPin, Building2, Globe, Phone, Mail, FileText, BarChart3, CheckCircle2 } from "lucide-react"
+import { Loader2, Search, MapPin, Building2, Globe, Phone, Mail, FileText, BarChart3, CheckCircle2, Send } from "lucide-react"
 
 import { authClient } from "@/lib/auth-client"
 import { useQuery } from "@tanstack/react-query"
@@ -17,6 +17,7 @@ export default function AgencyDashboard() {
     const [location, setLocation] = useState("")
     const [loading, setLoading] = useState(false)
     const [fetchingAuditFor, setFetchingAuditFor] = useState<string | null>(null)
+    const [sendingEmailFor, setSendingEmailFor] = useState<string | null>(null)
     const [viewingAudit, setViewingAudit] = useState<any>(null)
     const { data: session } = authClient.useSession()
 
@@ -122,13 +123,51 @@ export default function AgencyDashboard() {
         }
     }
 
+    const handleSendEmail = async (lead: any) => {
+        const audit = audits?.find((a: any) => a.websiteUrl === lead.website)
+        if (!audit) {
+            alert("Please generate an audit report first.")
+            return
+        }
+        if (!lead.email) {
+            alert("No email address found for this lead.")
+            return
+        }
+
+        setSendingEmailFor(lead.id)
+        try {
+            const res = await fetch("/api/send-lead-email", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    leadEmail: lead.email,
+                    businessName: lead.businessName,
+                    websiteUrl: lead.website,
+                    auditContent: audit.reportContent
+                })
+            })
+
+            if (!res.ok) {
+                const errorData = await res.json();
+                throw new Error(errorData.error || "Failed to send email");
+            }
+
+            alert(`Email sent successfully to ${lead.businessName}!`)
+        } catch (error: any) {
+            console.error(error)
+            alert(error.message || "Failed to send email.")
+        } finally {
+            setSendingEmailFor(null)
+        }
+    }
+
     return (
         <div className="max-w-7xl mx-auto space-y-8 p-4">
             <div className="text-center space-y-2">
                 <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent">
-                    Agency Lead Engine
+                    SEO Sniper Engine
                 </h1>
-                <p className="text-muted-foreground text-lg">Find local businesses and generate SEO audits at scale.</p>
+                <p className="text-muted-foreground text-lg text-balance">The ultimate value-first weapon. Find leads, audit sites, and dominate your niche.</p>
             </div>
 
             <Card className="glass border-white/10 shadow-2xl overflow-hidden">
@@ -283,6 +322,23 @@ export default function AgencyDashboard() {
                                                                                 className="h-8 text-[10px] font-bold border-indigo-500/20 hover:bg-indigo-500/10 hover:text-indigo-400"
                                                                             >
                                                                                 <Search size={12} className="mr-1" /> View Report
+                                                                            </Button>
+                                                                        )}
+
+                                                                        {auditExists && lead.email && (
+                                                                            <Button
+                                                                                size="xs"
+                                                                                variant="shiny"
+                                                                                disabled={sendingEmailFor === lead.id}
+                                                                                onClick={() => handleSendEmail(lead)}
+                                                                                className="h-8 text-[10px] font-bold"
+                                                                            >
+                                                                                {sendingEmailFor === lead.id ? (
+                                                                                    <Loader2 size={12} className="animate-spin mr-1" />
+                                                                                ) : (
+                                                                                    <Send size={12} className="mr-1" />
+                                                                                )}
+                                                                                Send Email
                                                                             </Button>
                                                                         )}
                                                                     </div>

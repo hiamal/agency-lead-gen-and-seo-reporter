@@ -67,9 +67,9 @@ export default function OwnerDashboard() {
 
     return (
         <div className="max-w-3xl mx-auto space-y-8">
-            <div className="text-center space-y-2">
-                <h1 className="text-3xl font-bold">Website Audit</h1>
-                <p className="text-muted-foreground">Enter your website URL to receive a comprehensive SEO report.</p>
+            <div className="text-center space-y-4">
+                <h1 className="text-4xl md:text-5xl font-extrabold bg-gradient-to-b from-white to-white/60 bg-clip-text text-transparent italic">The Invisible Website Fixer</h1>
+                <p className="text-xl text-slate-400 max-w-xl mx-auto">Is your business actually visible to your customers? Run a deep scan now to unmask the truth.</p>
             </div>
 
             <Card className="glass border-white/10">
