@@ -115,7 +115,8 @@ export async function POST(req: Request) {
                         createdAt: new Date(),
                     });
                     savedCount++;
-                    console.log(`  [${index + 1}/${leadsData.length}] Saved lead: ${leadData["Business Name"] || leadData.businessName}`);
+                    const hasEmail = Boolean(leadData["Email"] || leadData.email);
+                    console.log(`  [${index + 1}/${leadsData.length}] Saved lead: ${leadData["Business Name"] || leadData.businessName} | Has Email: ${hasEmail}`);
                 } catch (err) {
                     console.error(`  [${index + 1}/${leadsData.length}] Failed to save lead:`, leadData, err);
                 }
